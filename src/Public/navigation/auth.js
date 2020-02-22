@@ -6,7 +6,7 @@ const navigationOptions = title => {
   return {
     navigationOptions: {
       title: title,
-      headerStyle: { height: 50, backgroundColor: '#16e9e6' }
+      headerStyle: { height: 80, backgroundColor: '#1d949a' }
     }
   };
 };

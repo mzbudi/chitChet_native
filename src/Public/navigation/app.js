@@ -1,0 +1,107 @@
+import { createStackNavigator } from 'react-navigation-stack';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+import React from 'react';
+import { Icon } from 'react-native-elements';
+import Home from '../../App/Home';
+import Profile from '../../App/Profile';
+import Chat from '../../App/Home/Chats/';
+import FriendList from '../../App/FriendList';
+
+const navigationOptions = title => {
+  return {
+    navigationOptions: {
+      title: title,
+      headerStyle: { elevation: 0, backgroundColor: '#1d949a' }
+    }
+  };
+};
+
+const HomeScreen = createStackNavigator(
+  {
+    Home: {
+      screen: Home,
+      navigationOptions: {
+        title: 'Chats',
+        headerStyle: { elevation: 0, backgroundColor: '#1d949a' }
+      }
+    },
+    Chat: {
+      screen: Chat,
+      ...navigationOptions('Chat')
+    }
+  },
+  {
+    defaultNavigationOptions: {
+      headerTitleAlign: 'center'
+    }
+  }
+);
+
+const ProfileScreen = createStackNavigator(
+  {
+    Profile: {
+      screen: Profile,
+      ...navigationOptions('My Profile')
+    }
+  },
+  {
+    defaultNavigationOptions: {
+      headerTitleAlign: 'center'
+    }
+  }
+);
+
+const FriendListScreen = createStackNavigator(
+  {
+    FriendList: {
+      screen: FriendList,
+      ...navigationOptions('Friend List')
+    }
+  },
+  {
+    defaultNavigationOptions: {
+      headerTitleAlign: 'center'
+    }
+  }
+);
+
+// const FriendList = createStackNavigator({});
+
+HomeScreen.navigationOptions = ({ navigation }) => {
+  let tabBarVisible = true;
+  if (navigation.state.routes.length > 1) {
+    navigation.state.routes.map(route => {
+      if (route.routeName === 'Chat') {
+        tabBarVisible = false;
+      } else {
+        tabBarVisible = true;
+      }
+    });
+  }
+  return {
+    tabBarVisible
+  };
+};
+
+export default createBottomTabNavigator({
+  Home: {
+    screen: HomeScreen,
+    navigationOptions: {
+      tabBarIcon: ({ focused }) => <Icon type="entypo" name="home" size={25} />
+    }
+  },
+  Profile: {
+    screen: ProfileScreen,
+    navigationOptions: {
+      title: 'My Profile',
+      tabBarIcon: ({ focused }) => <Icon type="entypo" name="user" size={25} />
+    }
+  },
+  FriendList: {
+    screen: FriendListScreen,
+    navigationOptions: {
+      title: 'Friends',
+      tabBarIcon: ({ focused }) => <Icon type="entypo" name="users" size={25} />
+    }
+  }
+});
