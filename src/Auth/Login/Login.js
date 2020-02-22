@@ -1,24 +1,19 @@
-import React, { Component, Fragment } from 'react';
-import { Text, View } from 'react-native';
+import React, { Component } from 'react';
+import { View, ToastAndroid, Image } from 'react-native';
 import { connect } from 'react-redux';
 import { Input, Button, Icon } from 'react-native-elements';
+import { appFirebase } from '../../config/firebase';
+// import logo from '../../Public/assets/chitchetLogo.png';
 
 class Login extends Component {
   state = {
     email: '',
-    phone: '',
-    password: ''
+    password: '',
+    loading: false
   };
-
-  // static navigationOptions = (...props) => {
-  //   headerRight: (...props) => (
-  //     <Text onPress={() => console.log(props)}>Skip</Text>
-  //   );
-  // };
 
   handleRegist = () => {
     this.props.navigation.navigate('Register');
-    // console.log('asdsad');
   };
 
   handleChange = (text, type) => {
@@ -27,34 +22,67 @@ class Login extends Component {
     });
   };
 
+  handleLogin = () => {
+    const { email, password } = this.state;
+    const { navigation } = this.props;
+
+    this.setState({
+      loading: true
+    });
+
+    appFirebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(() => {
+        ToastAndroid.show('Loggin Succes!', ToastAndroid.SHORT);
+        navigation.navigate('Home');
+      })
+      .catch(error => {
+        ToastAndroid.show(error.message, ToastAndroid.SHORT);
+      })
+      .finally(() => {
+        this.setState({
+          loading: false
+        });
+      });
+  };
+
   render() {
+    const { loading } = this.state;
     return (
       <View style={styles.container}>
-        <Input
-          onChangeText={text => {
-            this.handleChange(text, 'phone');
-          }}
-          placeholder="Phone Number"
-          leftIcon={<Icon name="phone" type="entypo" size={24} color="black" />}
-        />
+        <View>
+          <Image
+            source={require('../../Public/assets/chitchetLogo.png')}
+            style={styles.imgLogo}
+          />
+        </View>
         <Input
           onChangeText={text => {
             this.handleChange(text, 'email');
           }}
+          placeholder="Email"
+          leftIcon={<Icon name="mail" type="entypo" size={24} color="black" />}
+        />
+        <Input
+          onChangeText={text => {
+            this.handleChange(text, 'password');
+          }}
+          secureTextEntry
           placeholder="Password"
           leftIcon={<Icon name="key" type="entypo" size={24} color="black" />}
         />
-
         <Button
-          // onPress={() => {
-          //   this.props.navigation.navigate('Register');
-          // }}
+          onPress={() => {
+            this.handleLogin();
+          }}
+          loading={loading}
           buttonStyle={styles.button}
           title="Login"
         />
         <Button
           onPress={() => {
-            this.props.navigation.navigate('Home');
+            this.handleRegist();
           }}
           buttonStyle={styles.button}
           title="Register"
@@ -71,6 +99,14 @@ const styles = {
   button: {
     marginTop: 16,
     padding: 16
+  },
+  imgLogo: {
+    width: 200,
+    height: 200,
+    borderRadius: 8,
+    alignSelf: 'center',
+    marginBottom: 16,
+    marginTop: 0
   }
 };
 
