@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { View, ToastAndroid } from 'react-native';
 import { connect } from 'react-redux';
 import { appFirebase } from '../../config/firebase';
@@ -15,7 +15,6 @@ class Register extends Component {
     this.setState({
       [type]: text
     });
-    console.log(this.state.email, this.state.password);
   };
 
   handleRegister = () => {

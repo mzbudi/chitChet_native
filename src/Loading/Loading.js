@@ -1,11 +1,11 @@
 import React, { Component, Fragment } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
-import firebase from 'react-native-firebase';
+import { appFirebase } from '../config/firebase';
 
 class Loading extends Component {
   componentDidMount() {
-    firebase.auth().onAuthStateChanged(user => {
-      this.props.navigation.navigate(user ? 'Main' : 'SignUp');
+    appFirebase.auth().onAuthStateChanged(user => {
+      this.props.navigation.navigate(user ? 'Home' : 'Login');
     });
   }
   render() {

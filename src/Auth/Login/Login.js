@@ -29,12 +29,12 @@ class Login extends Component {
     this.setState({
       loading: true
     });
-
+    navigation.navigate('Home');
     appFirebase
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then(() => {
-        ToastAndroid.show('Loggin Succes!', ToastAndroid.SHORT);
+        ToastAndroid.show('Login Succes!', ToastAndroid.SHORT);
         navigation.navigate('Home');
       })
       .catch(error => {
