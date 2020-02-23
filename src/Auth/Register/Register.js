@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
-import { View, ToastAndroid } from 'react-native';
+import { View, ToastAndroid, Image } from 'react-native';
 import { connect } from 'react-redux';
-import { appFirebase } from '../../config/firebase';
+import { db, appFirebase } from '../../config/firebase';
 import { Input, Button, Icon } from 'react-native-elements';
 
 class Register extends Component {
   state = {
     email: '',
     password: '',
+    name: '',
     loading: false
   };
 
@@ -18,7 +19,7 @@ class Register extends Component {
   };
 
   handleRegister = () => {
-    const { email, password } = this.state;
+    const { email, password, name } = this.state;
     const { navigation } = this.props;
     this.setState({
       loading: true
@@ -26,7 +27,10 @@ class Register extends Component {
     appFirebase
       .auth()
       .createUserWithEmailAndPassword(email, password)
-      .then(() => {
+      .then(credentialUser => {
+        db.ref('/users')
+          .child(credentialUser.user.uid)
+          .set({ name, email });
         ToastAndroid.show('Register Succes', ToastAndroid.SHORT);
         navigation.navigate('Login');
       })
@@ -44,11 +48,22 @@ class Register extends Component {
     const { loading } = this.state;
     return (
       <View style={styles.container}>
+        <Image
+          source={require('../../Public/assets/chitchetLogo.png')}
+          style={styles.imgLogo}
+        />
         <Input
           onChangeText={text => {
             this.handleChange(text, 'email');
           }}
           placeholder="Email"
+          leftIcon={<Icon name="mail" type="entypo" size={24} color="black" />}
+        />
+        <Input
+          onChangeText={text => {
+            this.handleChange(text, 'name');
+          }}
+          placeholder="Username"
           leftIcon={<Icon name="mail" type="entypo" size={24} color="black" />}
         />
         <Input
@@ -74,11 +89,21 @@ class Register extends Component {
 
 const styles = {
   container: {
-    padding: 16
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#ffffff'
   },
   button: {
-    marginTop: 16,
+    marginTop: 24,
     padding: 16
+  },
+  imgLogo: {
+    width: 200,
+    height: 200,
+    borderRadius: 8,
+    alignSelf: 'center',
+    marginBottom: 16,
+    marginTop: 0
   }
 };
 

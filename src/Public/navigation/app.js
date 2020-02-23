@@ -6,6 +6,9 @@ import Home from '../../App/Home';
 import Profile from '../../App/Profile';
 import Chat from '../../App/Home/Chats/';
 import FriendList from '../../App/FriendList';
+import ChangeName from '../../App/Profile/ChangeName';
+import ChangePassword from '../../App/Profile/ChangePassword';
+import ChangeStatus from '../../App/Profile/ChangeStatus';
 
 const navigationOptions = title => {
   return {
@@ -42,6 +45,18 @@ const ProfileScreen = createStackNavigator(
     Profile: {
       screen: Profile,
       ...navigationOptions('My Profile')
+    },
+    ChangeName: {
+      screen: ChangeName,
+      ...navigationOptions('Change Name')
+    },
+    ChangePassword: {
+      screen: ChangePassword,
+      ...navigationOptions('Change Password')
+    },
+    ChangeStatus: {
+      screen: ChangeStatus,
+      ...navigationOptions('Change Status')
     }
   },
   {

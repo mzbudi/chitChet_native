@@ -2,6 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Text, View, StyleSheet, Image } from 'react-native';
 import { connect } from 'react-redux';
 import { Card, ListItem } from 'react-native-elements';
+import { appFirebase } from '../../config/firebase';
 
 const list = [
   {
@@ -23,7 +24,9 @@ class Home extends Component {
     header: null,
     headerShown: false
   };
+
   render() {
+    const { auth } = this.props;
     return (
       <Fragment>
         <View style={{ backgroundColor: '#1d949a' }}>
@@ -33,6 +36,7 @@ class Home extends Component {
             leftAvatar={{
               source: {
                 uri:
+                  // auth.data.photoURL ||
                   'https://www.indomeme.id/wp-content/uploads/2020/01/polos.jpg'
               }
             }}
@@ -61,10 +65,19 @@ class Home extends Component {
 }
 
 const mapStateToProps = state => {
-  return {};
+  return {
+    auth: state.auth
+  };
 };
 
-export default connect(mapStateToProps)(Home);
+const mapDispatchToProps = dispatch => ({
+  currentUser: payload => dispatch({ payload, type: 'CURRENT_USER_FULFILLED' })
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Home);
 
 const styles = StyleSheet.create({
   container: {

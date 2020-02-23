@@ -21,6 +21,22 @@ const auth = (state = initialState, action) => {
         ...state,
         isLoading: false
       };
+    case 'CURRENT_USER_PENDING':
+      return {
+        ...state,
+        isLoading: false
+      };
+    case 'CURRENT_USER_REJECTED':
+      return {
+        ...state,
+        isLoading: false
+      };
+    case 'CURRENT_USER_FULFILLED':
+      return {
+        ...state,
+        isLoading: false,
+        data: action.payload
+      };
     default:
       return state;
   }

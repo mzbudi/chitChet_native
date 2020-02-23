@@ -4,12 +4,17 @@ import { View, StyleSheet, Text, ToastAndroid } from 'react-native';
 import { connect } from 'react-redux';
 import { appFirebase } from '../../config/firebase';
 import ImagePicker from 'react-native-image-picker';
+import { currentUser } from '../../Public/redux/action/auth';
 
 class Profile extends Component {
   state = {
     photo: null,
     blobPhoto: null
   };
+
+  componentDidMount() {
+    appFirebase.auth().currentUser;
+  }
 
   handleLogout = () => {
     appFirebase
@@ -48,8 +53,30 @@ class Profile extends Component {
             photo: source
           });
           this.handleUpload(source.uri, filename)
-            .then(() => {
-              ToastAndroid.show('Success Upload Image', ToastAndroid.SHORT);
+            .then(snapshot => {
+              const { fullPath } = snapshot.metadata;
+              appFirebase
+                .storage()
+                .ref()
+                .child(fullPath)
+                .getDownloadURL()
+                .then(url => {
+                  var user = appFirebase.auth().currentUser;
+                  user
+                    .updateProfile({
+                      photoURL: url
+                    })
+                    .then(function() {
+                      // this.props.dispatch(currentUser());
+                      ToastAndroid.show(
+                        'Success Upload Image',
+                        ToastAndroid.SHORT
+                      );
+                    })
+                    .catch(function(error) {
+                      ToastAndroid.show(error, ToastAndroid.SHORT);
+                    });
+                });
             })
             .catch(error => {
               ToastAndroid.show(error, ToastAndroid.SHORT);
@@ -114,7 +141,7 @@ class Profile extends Component {
 
         <ListItem
           onPress={() => {
-            this.handleUpload();
+            this.props.navigation.navigate('ChangeName');
           }}
           containerStyle={styles.whiteColor}
           title={<Text style={styles.midText}>Change Name</Text>}
@@ -122,12 +149,18 @@ class Profile extends Component {
           bottomDivider
         />
         <ListItem
+          onPress={() => {
+            this.props.navigation.navigate('ChangeStatus');
+          }}
           containerStyle={styles.whiteColor}
           title={<Text style={styles.midText}>Change Status</Text>}
           leftIcon={<Icon name="edit" type="entypo" color="#517fa4" />}
           bottomDivider
         />
         <ListItem
+          onPress={() => {
+            this.props.navigation.navigate('ChangePassword');
+          }}
           containerStyle={styles.whiteColor}
           title={<Text style={styles.midText}>Change Password</Text>}
           leftIcon={<Icon name="lock" type="entypo" color="#517fa4" />}

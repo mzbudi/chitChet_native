@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, ToastAndroid, Image } from 'react-native';
+import { View, ToastAndroid, Image, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import { Input, Button, Icon } from 'react-native-elements';
 import { appFirebase } from '../../config/firebase';
@@ -9,7 +9,8 @@ class Login extends Component {
   state = {
     email: '',
     password: '',
-    loading: false
+    loading: false,
+    showPassword: true
   };
 
   handleRegist = () => {
@@ -29,7 +30,6 @@ class Login extends Component {
     this.setState({
       loading: true
     });
-    navigation.navigate('Home');
     appFirebase
       .auth()
       .signInWithEmailAndPassword(email, password)
@@ -47,8 +47,14 @@ class Login extends Component {
       });
   };
 
+  showPassword = () => {
+    this.setState({
+      showPassword: !this.state.showPassword
+    });
+  };
+
   render() {
-    const { loading } = this.state;
+    const { loading, showPassword } = this.state;
     return (
       <View style={styles.container}>
         <View>
@@ -68,16 +74,29 @@ class Login extends Component {
           onChangeText={text => {
             this.handleChange(text, 'password');
           }}
-          secureTextEntry
+          secureTextEntry={showPassword}
           placeholder="Password"
           leftIcon={<Icon name="key" type="entypo" size={24} color="black" />}
+          rightIcon={
+            <TouchableOpacity
+              onPress={() => {
+                this.showPassword();
+              }}>
+              <Icon
+                name="eye-with-line"
+                type="entypo"
+                size={24}
+                color="black"
+              />
+            </TouchableOpacity>
+          }
         />
         <Button
           onPress={() => {
             this.handleLogin();
           }}
           loading={loading}
-          buttonStyle={styles.button}
+          buttonStyle={styles.buttonLogin}
           title="Login"
         />
         <Button
@@ -94,10 +113,16 @@ class Login extends Component {
 
 const styles = {
   container: {
-    padding: 16
+    flex: 1,
+    padding: 16,
+    backgroundColor: '#ffffff'
   },
   button: {
     marginTop: 16,
+    padding: 16
+  },
+  buttonLogin: {
+    marginTop: 24,
     padding: 16
   },
   imgLogo: {
