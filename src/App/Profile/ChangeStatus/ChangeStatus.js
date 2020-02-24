@@ -1,20 +1,29 @@
 import React, { Component, Fragment } from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, ToastAndroid } from 'react-native';
 import { connect } from 'react-redux';
 import { Input, Button, Icon } from 'react-native-elements';
+import { db, appFirebase } from '../../../config/firebase';
 
 class ChangeStatus extends Component {
   state = {
     loading: false,
-    newName: ''
+    status: ''
   };
   handleChange = text => {
     this.setState({
-      newName: text
+      status: text
     });
   };
 
-  handleChangeStatus = () => {};
+  handleChangeStatus = () => {
+    const user = appFirebase.auth().currentUser;
+    try {
+      db.ref(`users/${user.uid}/userStatus/`).set(this.state.status);
+      ToastAndroid.show('Status Has Been Changed', ToastAndroid.SHORT);
+    } catch (error) {
+      ToastAndroid.show(error, ToastAndroid.SHORT);
+    }
+  };
 
   render() {
     return (

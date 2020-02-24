@@ -6,7 +6,7 @@ import Home from '../../App/Home';
 import Profile from '../../App/Profile';
 import Chat from '../../App/Home/Chats/';
 import FriendList from '../../App/FriendList';
-// import FriendLocation from '../../App/FriendList/FriendLocation';
+import AddFriend from '../../App/AddFriend/';
 import FriendInfo from '../../App/FriendList/FriendInfo';
 import ChangeName from '../../App/Profile/ChangeName';
 import ChangePassword from '../../App/Profile/ChangePassword';
@@ -68,6 +68,20 @@ const ProfileScreen = createStackNavigator(
   }
 );
 
+const AddFriendScreen = createStackNavigator(
+  {
+    AddFriend: {
+      screen: AddFriend,
+      ...navigationOptions('Add Friend')
+    }
+  },
+  {
+    defaultNavigationOptions: {
+      headerTitleAlign: 'center'
+    }
+  }
+);
+
 const FriendListScreen = createStackNavigator(
   {
     FriendList: {
@@ -112,21 +126,36 @@ export default createBottomTabNavigator({
   Home: {
     screen: HomeScreen,
     navigationOptions: {
-      tabBarIcon: ({ focused }) => <Icon type="entypo" name="home" size={25} />
+      tabBarIcon: () => (
+        <Icon type="entypo" name="home" size={25} color={'#517fa4'} />
+      )
     }
   },
   Profile: {
     screen: ProfileScreen,
     navigationOptions: {
       title: 'My Profile',
-      tabBarIcon: ({ focused }) => <Icon type="entypo" name="user" size={25} />
+      tabBarIcon: () => (
+        <Icon type="entypo" name="user" size={25} color={'#517fa4'} />
+      )
     }
   },
   FriendList: {
     screen: FriendListScreen,
     navigationOptions: {
       title: 'Friends',
-      tabBarIcon: ({ focused }) => <Icon type="entypo" name="users" size={25} />
+      tabBarIcon: () => (
+        <Icon type="entypo" name="users" size={25} color={'#517fa4'} />
+      )
+    }
+  },
+  AddFriend: {
+    screen: AddFriendScreen,
+    navigationOptions: {
+      title: 'Add Friend',
+      tabBarIcon: () => (
+        <Icon type="entypo" name="add-user" size={25} color={'#517fa4'} />
+      )
     }
   }
 });

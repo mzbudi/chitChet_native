@@ -2,19 +2,35 @@ import React, { Component } from 'react';
 import { ListItem, Icon } from 'react-native-elements';
 import { View, StyleSheet, Text, ToastAndroid } from 'react-native';
 import { connect } from 'react-redux';
-import { appFirebase } from '../../config/firebase';
+import { db, appFirebase } from '../../config/firebase';
 import ImagePicker from 'react-native-image-picker';
 import { currentUser } from '../../Public/redux/action/auth';
 
 class Profile extends Component {
   state = {
     photo: null,
-    blobPhoto: null
+    blobPhoto: null,
+    dataProfile: []
   };
 
   componentDidMount() {
-    appFirebase.auth().currentUser;
+    const user = appFirebase.auth().currentUser;
+    this.getUser(user.uid);
   }
+
+  getUser = user_id => {
+    try {
+      db.ref(`/users/${user_id}`).on('value', snap => {
+        let data = snap.val();
+        console.log(data);
+        this.setState({
+          dataProfile: data
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   handleLogout = () => {
     appFirebase
@@ -62,6 +78,7 @@ class Profile extends Component {
                 .getDownloadURL()
                 .then(url => {
                   var user = appFirebase.auth().currentUser;
+                  db.ref(`users/${user.uid}/photoURL/`).set(user.photoURL);
                   user
                     .updateProfile({
                       photoURL: url
@@ -98,9 +115,10 @@ class Profile extends Component {
   };
 
   render() {
+    const { dataProfile } = this.state;
     return (
       <View style={styles.container}>
-        {this.state.photo !== null ? (
+        {this.state.dataProfile === 0 ? (
           <ListItem
             containerStyle={styles.whiteColor}
             key={1}
@@ -108,11 +126,10 @@ class Profile extends Component {
               size: 'large',
               showEditButton: true,
               source: {
-                uri: this.state.photo.uri
+                uri:
+                  'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'
               }
             }}
-            title={'Budi'}
-            subtitle={'Si bgst'}
             bottomDivider
             onPress={() => {
               this.handlePicture();
@@ -126,12 +143,11 @@ class Profile extends Component {
               size: 'large',
               showEditButton: true,
               source: {
-                uri:
-                  'https://www.indomeme.id/wp-content/uploads/2020/01/polos.jpg'
+                uri: dataProfile.photoURL
               }
             }}
-            title={'Budi'}
-            subtitle={'Si bgst'}
+            title={dataProfile.name}
+            subtitle={dataProfile.userStatus}
             bottomDivider
             onPress={() => {
               this.handlePicture();
@@ -173,7 +189,7 @@ class Profile extends Component {
           }}
           containerStyle={styles.whiteColor}
           title={<Text style={styles.midText}>Logout</Text>}
-          leftIcon={<Icon name="sc-telegram" type="evilicon" color="#517fa4" />}
+          leftIcon={<Icon name="log-out" type="entypo" color="#517fa4" />}
           bottomDivider
         />
       </View>

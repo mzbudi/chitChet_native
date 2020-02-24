@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { Text, View, StyleSheet, Image } from 'react-native';
 import { connect } from 'react-redux';
 import { Card, ListItem } from 'react-native-elements';
-import { appFirebase } from '../../config/firebase';
+import { db, appFirebase } from '../../config/firebase';
 
 const list = [
   {
@@ -21,7 +21,7 @@ const list = [
 
 class Home extends Component {
   state = {
-    photoURL: ''
+    dataProfile: []
   };
 
   static navigationOptions = {
@@ -31,28 +31,57 @@ class Home extends Component {
 
   componentDidMount() {
     const user = appFirebase.auth().currentUser;
-    this.setState({
-      photoURL: user.photoURL
-    });
+    this.getUser(user.uid);
   }
 
+  getUser = user_id => {
+    try {
+      db.ref(`/users/${user_id}`).on('value', snap => {
+        let data = snap.val();
+        this.setState({
+          dataProfile: data
+        });
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   render() {
-    const { auth } = this.props;
+    // const { auth } = this.props;
+    const { dataProfile } = this.state;
     return (
       <Fragment>
-        <View style={{ backgroundColor: '#1d949a' }}>
-          <ListItem
-            containerStyle={{ backgroundColor: '#1d949a' }}
-            key={1}
-            leftAvatar={{
-              source: {
-                uri: this.state.photoURL
-              }
-            }}
-            title={'Budi'}
-            subtitle={'Si Tmvn'}
-          />
-        </View>
+        {dataProfile.length === 0 ? (
+          <View style={{ backgroundColor: '#1d949a' }}>
+            <ListItem
+              containerStyle={{ backgroundColor: '#1d949a' }}
+              key={1}
+              leftAvatar={{
+                source: {
+                  uri:
+                    'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'
+                }
+              }}
+              title={dataProfile.name}
+              subtitle={dataProfile.userStatus}
+            />
+          </View>
+        ) : (
+          <View style={{ backgroundColor: '#1d949a' }}>
+            <ListItem
+              containerStyle={{ backgroundColor: '#1d949a' }}
+              key={1}
+              leftAvatar={{
+                source: {
+                  uri: dataProfile.photoURL
+                }
+              }}
+              title={dataProfile.name}
+              subtitle={dataProfile.userStatus}
+            />
+          </View>
+        )}
         <View style={styles.container}>
           {list.map((l, i) => (
             <Card containerStyle={{ padding: 0 }}>

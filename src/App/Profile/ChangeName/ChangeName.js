@@ -2,7 +2,7 @@ import React, { Component, Fragment } from 'react';
 import { View, Text, Image, ToastAndroid } from 'react-native';
 import { connect } from 'react-redux';
 import { Input, Button, Icon } from 'react-native-elements';
-import { appFirebase } from '../../../config/firebase';
+import { db, appFirebase } from '../../../config/firebase';
 
 class ChangeName extends Component {
   state = {
@@ -16,14 +16,18 @@ class ChangeName extends Component {
   };
 
   handleChangeName = () => {
-    var user = appFirebase.auth().currentUser;
+    const user = appFirebase.auth().currentUser;
     user
       .updateProfile({
         displayName: this.state.newName
       })
       .then(function() {
-        // this.props.dispatch(currentUser());
-        ToastAndroid.show('Success Upload Image', ToastAndroid.SHORT);
+        try {
+          db.ref(`users/${user.uid}/name/`).set(user.displayName);
+          ToastAndroid.show('Name Has Been Changed', ToastAndroid.SHORT);
+        } catch (error) {
+          console.log(error);
+        }
       })
       .catch(function(error) {
         ToastAndroid.show(error, ToastAndroid.SHORT);
@@ -33,10 +37,6 @@ class ChangeName extends Component {
   render() {
     return (
       <View style={styles.container}>
-        {/* <Image
-          source={require('../../../Public/assets/chitchetLogo.png')}
-          style={styles.imgLogo}
-        /> */}
         <Input
           onChangeText={text => {
             this.handleChange(text);
