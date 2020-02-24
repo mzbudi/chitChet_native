@@ -13,6 +13,15 @@ class Login extends Component {
     showPassword: true
   };
 
+  // componentDidMount() {
+  //   const storage = appFirebase.storage();
+  //   const auth = appFirebase.auth();
+  //   const authRef = auth
+
+  //   const storageRef = storage.ref();
+  //   const images = storageRef.child('picture/');
+  // }
+
   handleRegist = () => {
     this.props.navigation.navigate('Register');
   };

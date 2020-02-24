@@ -6,6 +6,8 @@ import Home from '../../App/Home';
 import Profile from '../../App/Profile';
 import Chat from '../../App/Home/Chats/';
 import FriendList from '../../App/FriendList';
+// import FriendLocation from '../../App/FriendList/FriendLocation';
+import FriendInfo from '../../App/FriendList/FriendInfo';
 import ChangeName from '../../App/Profile/ChangeName';
 import ChangePassword from '../../App/Profile/ChangePassword';
 import ChangeStatus from '../../App/Profile/ChangeStatus';
@@ -71,7 +73,15 @@ const FriendListScreen = createStackNavigator(
     FriendList: {
       screen: FriendList,
       ...navigationOptions('Friend List')
+    },
+    FriendInfo: {
+      screen: FriendInfo,
+      ...navigationOptions('Friend Info')
     }
+    // FriendLocation: {
+    //   screen: FriendLocation,
+    //   ...navigationOptions('Friend Location')
+    // }
   },
   {
     defaultNavigationOptions: {

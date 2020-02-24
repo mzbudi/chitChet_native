@@ -1,22 +1,44 @@
 import React, { Component, Fragment } from 'react';
-import { Text, View, StyleSheet } from 'react-native';
-import { ListItem } from 'react-native-elements';
+import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { ListItem, Icon, Image } from 'react-native-elements';
 
 class FriendBox extends Component {
+  handleLocation = () => {
+    this.props.navigation.navigate('FriendLocation');
+  };
+
+  handleProfile = () => {
+    this.props.navigation.navigate('FriendInfo');
+  };
+
   render() {
+    const { data } = this.props;
     return (
       <View style={styles.container}>
-        <ListItem
-          containerStyle={styles.boxPad}
-          key={1}
-          leftAvatar={{
-            source: {
-              uri:
-                'https://www.indomeme.id/wp-content/uploads/2020/01/polos.jpg'
+        <TouchableOpacity
+          onPress={() => {
+            this.handleProfile();
+          }}>
+          <ListItem
+            containerStyle={styles.boxPad}
+            key={1}
+            leftAvatar={{
+              source: {
+                uri: data.photoURL
+              }
+            }}
+            title={<Text>{data.name}</Text>}
+            subtitle={data.userStatus}
+            rightIcon={
+              <TouchableOpacity
+                onPress={() => {
+                  this.handleLocation();
+                }}>
+                <Icon type="foundation" name="marker" />
+              </TouchableOpacity>
             }
-          }}
-          title={<Text>Woi</Text>}
-        />
+          />
+        </TouchableOpacity>
       </View>
     );
   }

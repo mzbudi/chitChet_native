@@ -20,10 +20,21 @@ const list = [
 ];
 
 class Home extends Component {
+  state = {
+    photoURL: ''
+  };
+
   static navigationOptions = {
     header: null,
     headerShown: false
   };
+
+  componentDidMount() {
+    const user = appFirebase.auth().currentUser;
+    this.setState({
+      photoURL: user.photoURL
+    });
+  }
 
   render() {
     const { auth } = this.props;
@@ -35,13 +46,11 @@ class Home extends Component {
             key={1}
             leftAvatar={{
               source: {
-                uri:
-                  // auth.data.photoURL ||
-                  'https://www.indomeme.id/wp-content/uploads/2020/01/polos.jpg'
+                uri: this.state.photoURL
               }
             }}
             title={'Budi'}
-            subtitle={'Si bgst'}
+            subtitle={'Si Tmvn'}
           />
         </View>
         <View style={styles.container}>
