@@ -6,8 +6,25 @@ import { db, appFirebase } from '../../config/firebase';
 
 class FriendList extends Component {
   state = {
-    users: []
+    users: [],
+    usersAdded: []
   };
+  getUsersAdded = () => {
+    const myid = this.props.auth.data.uid
+    try {
+      db.ref(`/users/${myid}/friend`).on('value', snap => {
+        let data = Object.values(snap.val());
+        // console.log(data);
+        this.setState(
+          {
+            usersAdded: data
+          }
+        );
+      });
+    } catch (error) {
+      console.log(error)
+    }
+  }
   getUsers = () => {
     try {
       db.ref('/users').on('value', snap => {
@@ -16,9 +33,6 @@ class FriendList extends Component {
         this.setState(
           {
             users: data
-          },
-          () => {
-            console.log(this.state.users);
           }
         );
       });
@@ -28,12 +42,13 @@ class FriendList extends Component {
   };
   componentDidMount() {
     this.getUsers();
+    this.getUsersAdded();
   }
   render() {
-    const { users } = this.state;
+    const { users, usersAdded } = this.state;
     return (
       <View style={{ padding: 16 }}>
-        {Object.keys(users).map((item, i) => {
+        {usersAdded.map((item, i) => {
           return <FriendBox key={item} {...this.props} data={users[item]} />;
         })}
       </View>
@@ -42,6 +57,8 @@ class FriendList extends Component {
 }
 
 const mapStateToProps = state => {
-  return {};
+  return {
+    auth: state.auth
+  };
 };
 export default connect(mapStateToProps)(FriendList);

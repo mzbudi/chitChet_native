@@ -91,11 +91,11 @@ const FriendListScreen = createStackNavigator(
     FriendInfo: {
       screen: FriendInfo,
       ...navigationOptions('Friend Info')
+    },
+    FriendLocation: {
+      screen: FriendLocation,
+      ...navigationOptions('Friend Location')
     }
-    // FriendLocation: {
-    //   screen: FriendLocation,
-    //   ...navigationOptions('Friend Location')
-    // }
   },
   {
     defaultNavigationOptions: {

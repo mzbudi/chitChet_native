@@ -21,7 +21,9 @@ const list = [
 
 class Home extends Component {
   state = {
-    dataProfile: []
+    dataProfile: [],
+    users: [],
+    usersAdded: []
   };
 
   static navigationOptions = {
@@ -29,9 +31,11 @@ class Home extends Component {
     headerShown: false
   };
 
-  componentDidMount() {
+  componentDidMount = async () => {
     const user = appFirebase.auth().currentUser;
-    this.getUser(user.uid);
+    await this.getUser(user.uid);
+    await this.getAllUsers();
+    await this.getUserAdded();
   }
 
   getUser = user_id => {
@@ -47,9 +51,39 @@ class Home extends Component {
     }
   };
 
+  getAllUsers = () => {
+    try {
+      db.ref('users').on('value', snap => {
+        let data = snap.val();
+        this.setState({
+          users: data
+        }, () => {
+          console.log(this.state.users)
+        })
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  getUserAdded = () => {
+    const { auth } = this.props;
+    const myKey = auth.data.uid
+    try {
+      db.ref(`users/${myKey}/friend`).on('value', snap => {
+        let data = Object.values(snap.val());
+        this.setState({
+          usersAdded: data
+        })
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   render() {
     // const { auth } = this.props;
-    const { dataProfile } = this.state;
+    const { dataProfile, usersAdded, users } = this.state;
     return (
       <Fragment>
         {dataProfile.length === 0 ? (
@@ -68,34 +102,35 @@ class Home extends Component {
             />
           </View>
         ) : (
-          <View style={{ backgroundColor: '#1d949a' }}>
-            <ListItem
-              containerStyle={{ backgroundColor: '#1d949a' }}
-              key={1}
-              leftAvatar={{
-                source: {
-                  uri: dataProfile.photoURL
-                }
-              }}
-              title={dataProfile.name}
-              subtitle={dataProfile.userStatus}
-            />
-          </View>
-        )}
-        <View style={styles.container}>
-          {list.map((l, i) => (
-            <Card containerStyle={{ padding: 0 }}>
+            <View style={{ backgroundColor: '#1d949a' }}>
               <ListItem
-                key={i}
-                leftAvatar={{ source: { uri: l.avatar_url } }}
-                title={l.name}
-                subtitle={l.subtitle}
-                onPress={() => {
-                  this.props.navigation.navigate('Chat');
+                containerStyle={{ backgroundColor: '#1d949a' }}
+                key={1}
+                leftAvatar={{
+                  source: {
+                    uri: dataProfile.photoURL
+                  }
                 }}
+                title={dataProfile.name}
+                subtitle={dataProfile.userStatus}
               />
-            </Card>
-          ))}
+            </View>
+          )}
+        <View style={styles.container}>
+          {usersAdded.length != 0 ? (
+            usersAdded.map((item, i) => (
+              <Card containerStyle={{ padding: 0 }}>
+                <ListItem
+                  key={i}
+                  leftAvatar={{ source: { uri: users[item].photoURL } }}
+                  title={users[item].name}
+                  subtitle={users[item].userStatus}
+                  onPress={() => {
+                    this.props.navigation.navigate('Chat');
+                  }}
+                />
+              </Card>
+            ))) : <Text></Text>}
         </View>
       </Fragment>
     );
