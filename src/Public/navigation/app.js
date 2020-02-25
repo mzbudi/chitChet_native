@@ -6,6 +6,7 @@ import Home from '../../App/Home';
 import Profile from '../../App/Profile';
 import Chat from '../../App/Home/Chats/';
 import FriendList from '../../App/FriendList';
+import FriendLocation from '../../App/FriendList/FriendLocation';
 import AddFriend from '../../App/AddFriend/';
 import FriendInfo from '../../App/FriendList/FriendInfo';
 import ChangeName from '../../App/Profile/ChangeName';

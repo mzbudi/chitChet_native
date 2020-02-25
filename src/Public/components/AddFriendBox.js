@@ -1,25 +1,60 @@
 import React, { Component, Fragment } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, ToastAndroid } from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  ToastAndroid
+} from 'react-native';
 import { ListItem, Icon, Image } from 'react-native-elements';
-import { db, appFirebase } from '../../config/firebase'
+import { db, appFirebase } from '../../config/firebase';
 
 class AddFriendBox extends Component {
-  handleAddFriend = (_key, myKey) => {
-    db.ref(`users/${myKey}`).orderByChild('friend').equalTo(_key).once('value', snap => {
-      if (snap.val() === null) {
-        db.ref(`users/${myKey}/friend`).once('value', snap => {
-          console.log(snap.val())
-          if (snap.val() === null) {
-            db.ref(`users/${myKey}/friend`).push(_key)
-          } else {
-            db.ref(`users/${myKey}/friend`).push(_key)
-          }
-        })
-        ToastAndroid.show('Add Friend Succes', ToastAndroid.SHORT)
-      } else {
-        ToastAndroid.show('Add Friend Failed', ToastAndroid.SHORT)
-      }
-    })
+  handleAddFriend = (data, _key, myKey) => {
+    db.ref(`users/${myKey}`)
+      .orderByChild('friend')
+      .equalTo(_key)
+      .once('value', snap => {
+        if (snap.val() === null) {
+          db.ref(`users/${myKey}/friend`).push(_key);
+          db.ref('chat')
+            .push()
+            .then(res => {
+              db.ref(`chat/${res.key}`).push({
+                _id: _key,
+                text: 'Hello New Friend !',
+                createdAt: new Date().getTime,
+                user: {
+                  _id: myKey,
+                  name: data.name,
+                  avatar: data.photoURL
+                }
+              });
+              db.ref(`chatroom/${myKey}`).push({
+                id_chat: res.key,
+                lastUpdate: new Date().getTime(),
+                uid: _key
+              });
+              db.ref(`chatroom/${_key}`).push({
+                id_chat: res.key,
+                lastUpdate: new Date().getTime(),
+                uid: myKey
+              });
+            });
+
+          // .once('value', snap => {
+          //   console.log(snap.val());
+          //   if (snap.val() === null) {
+          //     db.ref(`users/${myKey}/friend`).push(_key);
+          //   } else {
+          //     db.ref(`users/${myKey}/friend`).push(_key);
+          //   }
+          // });
+          ToastAndroid.show('Add Friend Succes', ToastAndroid.SHORT);
+        } else {
+          ToastAndroid.show('Add Friend Failed', ToastAndroid.SHORT);
+        }
+      });
   };
 
   handleProfile = () => {
@@ -44,7 +79,7 @@ class AddFriendBox extends Component {
           rightIcon={
             <TouchableOpacity
               onPress={() => {
-                this.handleAddFriend(_key, myKey);
+                this.handleAddFriend(data, _key, myKey);
               }}>
               <Icon type="entypo" name="squared-plus" />
             </TouchableOpacity>

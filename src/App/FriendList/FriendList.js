@@ -13,13 +13,15 @@ class FriendList extends Component {
     const myid = this.props.auth.data.uid
     try {
       db.ref(`/users/${myid}/friend`).on('value', snap => {
-        let data = Object.values(snap.val());
-        // console.log(data);
-        this.setState(
-          {
-            usersAdded: data
-          }
-        );
+        if (snap.val() !== null) {
+          let data = Object.values(snap.val());
+          // console.log(data);
+          this.setState(
+            {
+              usersAdded: data
+            }
+          );
+        }
       });
     } catch (error) {
       console.log(error)

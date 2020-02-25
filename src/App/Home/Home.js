@@ -1,29 +1,16 @@
 import React, { Component, Fragment } from 'react';
-import { Text, View, StyleSheet, Image } from 'react-native';
+import { Text, View, StyleSheet, Image, FlatList } from 'react-native';
 import { connect } from 'react-redux';
 import { Card, ListItem } from 'react-native-elements';
 import { db, appFirebase } from '../../config/firebase';
-
-const list = [
-  {
-    name: 'Amy Farha',
-    avatar_url:
-      'https://s3.amazonaws.com/uifaces/faces/twitter/ladylexy/128.jpg',
-    subtitle: 'Vice President'
-  },
-  {
-    name: 'Dayat',
-    avatar_url:
-      'https://pbs.twimg.com/profile_images/1136553375145742336/d9fpvVXz_400x400.jpg',
-    subtitle: 'Harta Tahta Kuota'
-  }
-];
 
 class Home extends Component {
   state = {
     dataProfile: [],
     users: [],
-    usersAdded: []
+    usersAdded: [],
+    photoUrl: '',
+    chatData: []
   };
 
   static navigationOptions = {
@@ -31,12 +18,12 @@ class Home extends Component {
     headerShown: false
   };
 
-  componentDidMount = async () => {
+  componentWillMount = async () => {
     const user = appFirebase.auth().currentUser;
     await this.getUser(user.uid);
     await this.getAllUsers();
     await this.getUserAdded();
-  }
+  };
 
   getUser = user_id => {
     try {
@@ -52,38 +39,53 @@ class Home extends Component {
   };
 
   getAllUsers = () => {
+    const { auth } = this.props;
+    const myKey = auth.data.uid;
     try {
       db.ref('users').on('value', snap => {
         let data = snap.val();
         this.setState({
           users: data
-        }, () => {
-          console.log(this.state.users)
-        })
-      })
+        });
+        db.ref(`chatroom/${myKey}`).on('value', snap => {
+          let setData = Object.values(snap.val());
+          this.setState({
+            chatData: setData
+          });
+        });
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   getUserAdded = () => {
     const { auth } = this.props;
-    const myKey = auth.data.uid
+    const myKey = auth.data.uid;
     try {
       db.ref(`users/${myKey}/friend`).on('value', snap => {
-        let data = Object.values(snap.val());
-        this.setState({
-          usersAdded: data
-        })
-      })
+        if (snap.val() !== null) {
+          let data = Object.values(snap.val());
+          this.setState({
+            usersAdded: data
+          });
+        }
+      });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
+
+  handleChat = (receiver_id, users) => {
+    // const { auth } = this.props;
+    // db.ref(`/users/${auth.data.uid}`).child('/chatroom');
+    // this.props.navigation.navigate('Chat', { receiver_id, users });
+  };
 
   render() {
     // const { auth } = this.props;
-    const { dataProfile, usersAdded, users } = this.state;
+    const { dataProfile, usersAdded, users, chatData } = this.state;
+    console.log(chatData);
     return (
       <Fragment>
         {dataProfile.length === 0 ? (
@@ -102,35 +104,46 @@ class Home extends Component {
             />
           </View>
         ) : (
-            <View style={{ backgroundColor: '#1d949a' }}>
-              <ListItem
-                containerStyle={{ backgroundColor: '#1d949a' }}
-                key={1}
-                leftAvatar={{
-                  source: {
-                    uri: dataProfile.photoURL
-                  }
-                }}
-                title={dataProfile.name}
-                subtitle={dataProfile.userStatus}
-              />
-            </View>
-          )}
+          <View style={{ backgroundColor: '#1d949a' }}>
+            <ListItem
+              containerStyle={{ backgroundColor: '#1d949a' }}
+              key={1}
+              leftAvatar={{
+                source: {
+                  uri: dataProfile.photoURL || ''
+                }
+              }}
+              title={dataProfile.name}
+              subtitle={dataProfile.userStatus}
+            />
+          </View>
+        )}
         <View style={styles.container}>
-          {usersAdded.length != 0 ? (
-            usersAdded.map((item, i) => (
-              <Card containerStyle={{ padding: 0 }}>
+          {usersAdded.length !== 0 ? (
+            <FlatList
+              style={styles.paddingFlatList}
+              data={usersAdded}
+              renderItem={({ item }) => (
                 <ListItem
-                  key={i}
-                  leftAvatar={{ source: { uri: users[item].photoURL } }}
+                  leftAvatar={{
+                    source: { uri: users[item].photoURL || this.state.photoUrl }
+                  }}
                   title={users[item].name}
                   subtitle={users[item].userStatus}
                   onPress={() => {
-                    this.props.navigation.navigate('Chat');
+                    this.props.navigation.navigate('Chat', {
+                      item,
+                      chatData,
+                      users
+                    });
                   }}
                 />
-              </Card>
-            ))) : <Text></Text>}
+              )}
+              keyExtractor={item => users[item].uid}
+            />
+          ) : (
+            <Text />
+          )}
         </View>
       </Fragment>
     );
