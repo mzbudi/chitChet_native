@@ -1,5 +1,5 @@
 import React, { Component, Fragment } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import { connect } from 'react-redux';
 import ChatBox from '../../../Public/components/ChatBox';
 import { GiftedChat } from 'react-native-gifted-chat';
@@ -11,74 +11,38 @@ class Chat extends Component {
     id_chat: []
   };
 
-  componentDidMount = async () => {
+  componentDidMount() {
     const { navigation, auth } = this.props;
-    const { id_chat } = this.state;
-    const key = navigation.state.params.item;
-    const chatRoom = navigation.state.params.chatData;
+    // const key = navigation.state.params.item.uid;
+    const id_chat = navigation.state.params.item.id_chat;
 
-    chatRoom.forEach((element, i) => {
-      if (element.uid === key.toString()) {
-        this.setState(
-          {
-            id_chat: element
-          },
-          () => {
-            db.ref(`chat/${this.state.id_chat.id_chat}`).on('value', snap => {
-              const resultVal = Object.values(snap.val());
-              console.log(resultVal);
-              this.setState(
-                {
-                  messages: resultVal
-                },
-                () => {
-                  console.log(this.state.messages);
-                }
-              );
-            });
-          }
-        );
-      }
-    });
-    // this.console.log(element.id_chat);
+    // db.ref(`chat/${id_chat}`).on('child_added', snap => {
+    //   const resultVal = snap.val();
+    //   this.setState(
+    //     previousState => ({
+    //       messages: GiftedChat.append(previousState.messages, [resultVal])
+    //     }),
+    //     () => {
+    //       console.log(this.state.messages);
+    //     }
+    //   );
+    // });
 
-    // console.log(this.state.id_chat);
-  };
-
-  getIdChat = () => {
-    const { navigation, auth } = this.props;
-    const key = navigation.state.params.item;
-    const { id_chat } = this.state;
-    return new Promise((resolve, reject) => {
-      navigation.state.params.chatData.forEach((element, i) => {
-        if (element.uid === key.toString()) {
-          this.setState({
-            id_chat: element
-          });
-          resolve(id_chat);
-        } else {
-          reject();
-        }
+    db.ref(`chat/${id_chat}`).on('value', snap => {
+      const resultVal = Object.values(snap.val());
+      this.setState({
+        messages: resultVal
       });
     });
-  };
-
-  getDataChat = () => {
-    const { auth } = this.props;
-    const user_id = auth.data.uid;
-    try {
-      db.ref(`chatroom/${user_id}`).on('value', snap => {});
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  }
 
   onSend(messages = []) {
-    const { id_chat } = this.state;
     const { navigation, auth } = this.props;
-    const key = navigation.state.params.item;
-    const dataKey = navigation.state.params.users[navigation.state.params.item];
-    db.ref(`chat/${id_chat.id_chat}`).push({
+    const id_chat = navigation.state.params.item.id_chat;
+    const key = navigation.state.params.item.uid;
+    const dataKey =
+      navigation.state.params.users[navigation.state.params.item.uid];
+    db.ref(`chat/${id_chat}`).push({
       _id: key,
       text: messages[0].text,
       createdAt: new Date().getTime(),
@@ -92,13 +56,17 @@ class Chat extends Component {
 
   render() {
     const { navigation, auth } = this.props;
-    const key = navigation.state.params.item;
-    const dataKey = navigation.state.params.users[navigation.state.params.item];
-    console.log(this.state.messages);
+    // const { messages } = this.state;
+    const messageRendered = this.state.messages;
+    const key = navigation.state.params.item.uid;
+    const dataKey =
+      navigation.state.params.users[navigation.state.params.item.uid];
+    console.log(key, dataKey);
     return (
       <GiftedChat
-        messages={this.state.messages.reverse()}
+        messages={messageRendered}
         onSend={messages => this.onSend(messages)}
+        inverted={false}
         user={{
           _id: auth.data.uid
         }}

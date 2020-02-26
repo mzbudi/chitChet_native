@@ -1,5 +1,5 @@
-import React, { Component, Fragment } from 'react';
-import { View, Text, Image, ToastAndroid } from 'react-native';
+import React, { Component } from 'react';
+import { View, ToastAndroid, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
 import { Input, Button, Icon } from 'react-native-elements';
 import { appFirebase } from '../../../config/firebase';
@@ -7,7 +7,8 @@ import { appFirebase } from '../../../config/firebase';
 class ChangePassword extends Component {
   state = {
     loading: false,
-    password: ''
+    password: '',
+    showPassword: true
   };
   handleChange = text => {
     this.setState({
@@ -15,47 +16,53 @@ class ChangePassword extends Component {
     });
   };
 
+  showPassword = () => {
+    this.setState({
+      showPassword: !this.state.showPassword
+    });
+  };
+
   handleChangePassword = () => {
+    const { password } = this.state;
+    const { navigation } = this.props;
     var user = appFirebase.auth().currentUser;
     user
-      .updatePassword('Budi')
+      .updatePassword(password)
       .then(function() {
-        // this.props.dispatch(currentUser());
+        navigation.navigate('Profile');
         ToastAndroid.show('Success Change Password', ToastAndroid.SHORT);
       })
       .catch(function(error) {
-        ToastAndroid.show(error, ToastAndroid.SHORT);
+        ToastAndroid.show(error.message, ToastAndroid.SHORT);
       });
   };
 
   render() {
+    const { password, showPassword } = this.state;
     return (
       <View style={styles.container}>
-        {/* <Image
-          source={require('../../../Public/assets/chitchetLogo.png')}
-          style={styles.imgLogo}
-        /> */}
-        {/* <Input
-          onChangeText={text => {
-            this.handleChange(text);
-          }}
-          placeholder="Old Password"
-          leftIcon={<Icon name="lock" type="entypo" color="#517fa4" />}
-        /> */}
         <Input
           onChangeText={text => {
             this.handleChange(text);
           }}
           placeholder="New Password"
           leftIcon={<Icon name="lock" type="entypo" />}
+          secureTextEntry={showPassword}
+          rightIcon={
+            <TouchableOpacity
+              onPress={() => {
+                this.showPassword();
+              }}>
+              <Icon
+                name="eye-with-line"
+                type="entypo"
+                size={24}
+                color="black"
+              />
+            </TouchableOpacity>
+          }
+          defaultValue={password}
         />
-        {/* <Input
-          onChangeText={text => {
-            this.handleChange(text);
-          }}
-          placeholder="Re-Type Password"
-          leftIcon={<Icon name="lock" type="entypo" />}
-        /> */}
         <Button
           onPress={() => {
             this.handleChangePassword();

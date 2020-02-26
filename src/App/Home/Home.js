@@ -49,14 +49,6 @@ class Home extends Component {
         this.setState({
           users: data
         });
-        db.ref(`chatroom/${myKey}`).on('value', snap => {
-          if (snap.val() !== null) {
-            let setData = Object.values(snap.val());
-            this.setState({
-              chatData: setData
-            });
-          }
-        });
       });
     } catch (error) {
       console.log(error);
@@ -67,7 +59,7 @@ class Home extends Component {
     const { auth } = this.props;
     const myKey = auth.data.uid;
     try {
-      db.ref(`users/${myKey}/friend`).on('value', snap => {
+      db.ref(`chatroom/${myKey}`).on('value', snap => {
         if (snap.val() !== null) {
           let data = Object.values(snap.val());
           this.setState({
@@ -84,9 +76,9 @@ class Home extends Component {
     // const { auth } = this.props;
     const { dataProfile, usersAdded, users, chatData } = this.state;
     // console.log(users, usersAdded, dataProfile);
-    console.log(chatData);
+    console.log(users);
     console.log(usersAdded);
-    console.log(usersAdded);
+    // console.log(usersAdded);
     return (
       <Fragment>
         {dataProfile ? (
@@ -124,27 +116,28 @@ class Home extends Component {
             <Text />
           )} */}
           {/* {console.log(users.length)} */}
-          {users.length !== 0 && usersAdded !== 0 ? (
+          {users.length !== 0 && usersAdded.length !== 0 ? (
             <FlatList
               style={styles.paddingFlatList}
               data={usersAdded}
               renderItem={({ item }) => (
                 <ListItem
                   leftAvatar={{
-                    source: { uri: users[item].photoURL || this.state.photoUrl }
+                    source: {
+                      uri: users[item.uid].photoURL || this.state.photoUrl
+                    }
                   }}
-                  title={users[item].name}
-                  subtitle={users[item].userStatus}
+                  title={users[item.uid].name}
+                  subtitle={users[item.uid].userStatus}
                   onPress={() => {
                     this.props.navigation.navigate('Chat', {
                       item,
-                      chatData,
                       users
                     });
                   }}
                 />
               )}
-              keyExtractor={item => users[item].uid}
+              keyExtractor={item => users[item.uid].uid}
             />
           ) : (
             <Text />

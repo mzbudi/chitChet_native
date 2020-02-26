@@ -19,6 +19,7 @@ class ChangeStatus extends Component {
     const user = appFirebase.auth().currentUser;
     try {
       db.ref(`users/${user.uid}/userStatus/`).set(this.state.status);
+      this.props.navigation.navigate('Profile');
       ToastAndroid.show('Status Has Been Changed', ToastAndroid.SHORT);
     } catch (error) {
       ToastAndroid.show(error, ToastAndroid.SHORT);

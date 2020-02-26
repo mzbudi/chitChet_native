@@ -25,6 +25,7 @@ class ChangeName extends Component {
         try {
           db.ref(`users/${user.uid}/name/`).set(user.displayName);
           ToastAndroid.show('Name Has Been Changed', ToastAndroid.SHORT);
+          this.props.navigation.navigate('Profile');
         } catch (error) {
           console.log(error);
         }
