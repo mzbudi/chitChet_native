@@ -18,20 +18,22 @@ class Home extends Component {
     headerShown: false
   };
 
-  componentWillMount = async () => {
+  componentDidMount() {
     const user = appFirebase.auth().currentUser;
-    await this.getUser(user.uid);
-    await this.getAllUsers();
-    await this.getUserAdded();
-  };
+    this.getUser(user.uid);
+    this.getAllUsers();
+    this.getUserAdded();
+  }
 
   getUser = user_id => {
     try {
       db.ref(`/users/${user_id}`).on('value', snap => {
         let data = snap.val();
-        this.setState({
-          dataProfile: data
-        });
+        if (data !== null) {
+          this.setState({
+            dataProfile: data
+          });
+        }
       });
     } catch (error) {
       console.log(error);
@@ -48,10 +50,12 @@ class Home extends Component {
           users: data
         });
         db.ref(`chatroom/${myKey}`).on('value', snap => {
-          let setData = Object.values(snap.val());
-          this.setState({
-            chatData: setData
-          });
+          if (snap.val() !== null) {
+            let setData = Object.values(snap.val());
+            this.setState({
+              chatData: setData
+            });
+          }
         });
       });
     } catch (error) {
@@ -76,27 +80,23 @@ class Home extends Component {
     }
   };
 
-  handleChat = (receiver_id, users) => {
-    // const { auth } = this.props;
-    // db.ref(`/users/${auth.data.uid}`).child('/chatroom');
-    // this.props.navigation.navigate('Chat', { receiver_id, users });
-  };
-
   render() {
     // const { auth } = this.props;
     const { dataProfile, usersAdded, users, chatData } = this.state;
+    // console.log(users, usersAdded, dataProfile);
     console.log(chatData);
+    console.log(usersAdded);
+    console.log(usersAdded);
     return (
       <Fragment>
-        {dataProfile.length === 0 ? (
+        {dataProfile ? (
           <View style={{ backgroundColor: '#1d949a' }}>
             <ListItem
               containerStyle={{ backgroundColor: '#1d949a' }}
               key={1}
               leftAvatar={{
                 source: {
-                  uri:
-                    'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'
+                  uri: dataProfile.photoURL
                 }
               }}
               title={dataProfile.name}
@@ -110,16 +110,21 @@ class Home extends Component {
               key={1}
               leftAvatar={{
                 source: {
-                  uri: dataProfile.photoURL || ''
+                  uri:
+                    'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png'
                 }
               }}
-              title={dataProfile.name}
-              subtitle={dataProfile.userStatus}
             />
           </View>
         )}
         <View style={styles.container}>
-          {usersAdded.length !== 0 ? (
+          {/* {users.length !== 0 && usersAdded !== 0 ? (
+            console.log(users)
+          ) : (
+            <Text />
+          )} */}
+          {/* {console.log(users.length)} */}
+          {users.length !== 0 && usersAdded !== 0 ? (
             <FlatList
               style={styles.paddingFlatList}
               data={usersAdded}

@@ -17,13 +17,14 @@ class AddFriendBox extends Component {
       .once('value', snap => {
         if (snap.val() === null) {
           db.ref(`users/${myKey}/friend`).push(_key);
+          db.ref(`users/${_key}/friend`).push(myKey);
           db.ref('chat')
             .push()
             .then(res => {
               db.ref(`chat/${res.key}`).push({
                 _id: _key,
                 text: 'Hello New Friend !',
-                createdAt: new Date().getTime,
+                createdAt: new Date().getTime(),
                 user: {
                   _id: myKey,
                   name: data.name,

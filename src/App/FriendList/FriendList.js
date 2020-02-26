@@ -10,33 +10,29 @@ class FriendList extends Component {
     usersAdded: []
   };
   getUsersAdded = () => {
-    const myid = this.props.auth.data.uid
+    const myid = this.props.auth.data.uid;
     try {
       db.ref(`/users/${myid}/friend`).on('value', snap => {
         if (snap.val() !== null) {
           let data = Object.values(snap.val());
           // console.log(data);
-          this.setState(
-            {
-              usersAdded: data
-            }
-          );
+          this.setState({
+            usersAdded: data
+          });
         }
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
   getUsers = () => {
     try {
       db.ref('/users').on('value', snap => {
         let data = snap.val();
         // console.log(data);
-        this.setState(
-          {
-            users: data
-          }
-        );
+        this.setState({
+          users: data
+        });
       });
     } catch (error) {
       console.log(error);

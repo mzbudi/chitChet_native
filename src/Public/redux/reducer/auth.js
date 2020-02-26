@@ -37,6 +37,12 @@ const auth = (state = initialState, action) => {
         isLoading: false,
         data: action.payload
       };
+    case 'LOGIN_DATA':
+      return {
+        ...state,
+        isLoading: false,
+        data: action.payload
+      };
     default:
       return state;
   }

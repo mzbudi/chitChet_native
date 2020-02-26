@@ -21,7 +21,7 @@ class ChangePassword extends Component {
       .updatePassword('Budi')
       .then(function() {
         // this.props.dispatch(currentUser());
-        ToastAndroid.show('Success Upload Image', ToastAndroid.SHORT);
+        ToastAndroid.show('Success Change Password', ToastAndroid.SHORT);
       })
       .catch(function(error) {
         ToastAndroid.show(error, ToastAndroid.SHORT);

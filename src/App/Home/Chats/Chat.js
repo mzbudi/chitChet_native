@@ -24,25 +24,25 @@ class Chat extends Component {
             id_chat: element
           },
           () => {
-            db.ref(`chat/${this.state.id_chat.id_chat}`).on(
-              'child_added',
-              snap => {
-                const resultVal = snap.val();
-                console.log(resultVal);
-                this.setState(previousState => ({
-                  messages: GiftedChat.append(previousState.messages, {
-                    ...resultVal
-                  })
-                }));
-              }
-            );
+            db.ref(`chat/${this.state.id_chat.id_chat}`).on('value', snap => {
+              const resultVal = Object.values(snap.val());
+              console.log(resultVal);
+              this.setState(
+                {
+                  messages: resultVal
+                },
+                () => {
+                  console.log(this.state.messages);
+                }
+              );
+            });
           }
         );
       }
     });
     // this.console.log(element.id_chat);
 
-    console.log(this.state.id_chat);
+    // console.log(this.state.id_chat);
   };
 
   getIdChat = () => {
@@ -84,8 +84,8 @@ class Chat extends Component {
       createdAt: new Date().getTime(),
       user: {
         _id: auth.data.uid,
-        name: dataKey.name,
-        avatar: dataKey.photoURL
+        name: auth.data.displayName,
+        avatar: auth.data.photoURL
       }
     });
   }
@@ -94,9 +94,10 @@ class Chat extends Component {
     const { navigation, auth } = this.props;
     const key = navigation.state.params.item;
     const dataKey = navigation.state.params.users[navigation.state.params.item];
+    console.log(this.state.messages);
     return (
       <GiftedChat
-        messages={this.state.messages}
+        messages={this.state.messages.reverse()}
         onSend={messages => this.onSend(messages)}
         user={{
           _id: auth.data.uid

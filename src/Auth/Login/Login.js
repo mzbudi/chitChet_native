@@ -42,9 +42,11 @@ class Login extends Component {
     appFirebase
       .auth()
       .signInWithEmailAndPassword(email, password)
-      .then(() => {
+      .then(snap => {
         ToastAndroid.show('Login Succes!', ToastAndroid.SHORT);
-        navigation.navigate('Home');
+        // navigation.navigate('Home');
+
+        this.props.getDataLogin(snap.user);
       })
       .catch(error => {
         ToastAndroid.show(error.message, ToastAndroid.SHORT);
@@ -148,4 +150,11 @@ const mapStateToProps = state => {
   return {};
 };
 
-export default connect(mapStateToProps)(Login);
+const mapDispatchToProps = dispatch => ({
+  getDataLogin: payload => dispatch({ type: 'LOGIN_DATA', payload })
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(Login);
