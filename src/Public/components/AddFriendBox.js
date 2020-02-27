@@ -31,14 +31,18 @@ class AddFriendBox extends Component {
                   avatar: data.photoURL
                 }
               });
-              db.ref(`chatroom/${myKey}`).push({
+              db.ref(`chatroom/${myKey}/${_key}`).set({
                 id_chat: res.key,
+                lastMessage: 'Hello New Friend',
                 lastUpdate: new Date().getTime(),
+                unreadMessage: 0,
                 uid: _key
               });
-              db.ref(`chatroom/${_key}`).push({
+              db.ref(`chatroom/${_key}/${myKey}`).set({
                 id_chat: res.key,
+                lastMessage: 'Hello New Friend',
                 lastUpdate: new Date().getTime(),
+                unreadMessage: 0,
                 uid: myKey
               });
             });

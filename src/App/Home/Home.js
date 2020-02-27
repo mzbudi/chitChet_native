@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Text, View, StyleSheet, Image, FlatList } from 'react-native';
 import { connect } from 'react-redux';
-import { Card, ListItem } from 'react-native-elements';
+import { Card, ListItem, Badge } from 'react-native-elements';
 import { db, appFirebase } from '../../config/firebase';
 
 class Home extends Component {
@@ -23,6 +23,7 @@ class Home extends Component {
     this.getUser(user.uid);
     this.getAllUsers();
     this.getUserAdded();
+    // this.getChatData();
   }
 
   getUser = user_id => {
@@ -39,6 +40,20 @@ class Home extends Component {
       console.log(error);
     }
   };
+
+  // getChatData = () => {
+  //   const { auth } = this.props;
+  //   try {
+  //     db.ref(`/chatroom/${auth.data.uid}`).on('value', snap => {
+  //       if (snap.val() !== null) {
+  //         let data = snap.val();
+  //         console.log(data);
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   getAllUsers = () => {
     const { auth } = this.props;
@@ -73,11 +88,9 @@ class Home extends Component {
   };
 
   render() {
-    // const { auth } = this.props;
     const { dataProfile, usersAdded, users, chatData } = this.state;
-    // console.log(users, usersAdded, dataProfile);
-    console.log(users);
-    console.log(usersAdded);
+    const { auth } = this.props;
+    const myKey = auth.data.uid;
     // console.log(usersAdded);
     return (
       <Fragment>
@@ -110,12 +123,6 @@ class Home extends Component {
           </View>
         )}
         <View style={styles.container}>
-          {/* {users.length !== 0 && usersAdded !== 0 ? (
-            console.log(users)
-          ) : (
-            <Text />
-          )} */}
-          {/* {console.log(users.length)} */}
           {users.length !== 0 && usersAdded.length !== 0 ? (
             <FlatList
               style={styles.paddingFlatList}
@@ -128,13 +135,23 @@ class Home extends Component {
                     }
                   }}
                   title={users[item.uid].name}
-                  subtitle={users[item.uid].userStatus}
+                  subtitle={<Text numberOfLines={1}>{item.lastMessage}</Text>}
                   onPress={() => {
+                    db.ref(`chatroom/${myKey}/${item.uid}/unreadMessage`).set(
+                      0
+                    );
                     this.props.navigation.navigate('Chat', {
                       item,
                       users
                     });
                   }}
+                  rightTitle={
+                    item.unreadMessage === 0 ? (
+                      ''
+                    ) : (
+                      <Badge value={item.unreadMessage} status="primary" />
+                    )
+                  }
                 />
               )}
               keyExtractor={item => users[item.uid].uid}

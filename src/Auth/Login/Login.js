@@ -1,5 +1,11 @@
 import React, { Component } from 'react';
-import { View, ToastAndroid, Image, TouchableOpacity } from 'react-native';
+import {
+  View,
+  ToastAndroid,
+  Image,
+  TouchableOpacity,
+  ScrollView
+} from 'react-native';
 import { connect } from 'react-redux';
 import { Input, Button, Icon } from 'react-native-elements';
 import { appFirebase } from '../../config/firebase';
@@ -68,55 +74,59 @@ class Login extends Component {
     const { loading, showPassword } = this.state;
     return (
       <View style={styles.container}>
-        <View>
-          <Image
-            source={require('../../Public/assets/chitchetLogo.png')}
-            style={styles.imgLogo}
+        <ScrollView>
+          <View>
+            <Image
+              source={require('../../Public/assets/chitchetLogo.png')}
+              style={styles.imgLogo}
+            />
+          </View>
+          <Input
+            onChangeText={text => {
+              this.handleChange(text, 'email');
+            }}
+            placeholder="Email"
+            leftIcon={
+              <Icon name="mail" type="entypo" size={24} color="black" />
+            }
           />
-        </View>
-        <Input
-          onChangeText={text => {
-            this.handleChange(text, 'email');
-          }}
-          placeholder="Email"
-          leftIcon={<Icon name="mail" type="entypo" size={24} color="black" />}
-        />
-        <Input
-          onChangeText={text => {
-            this.handleChange(text, 'password');
-          }}
-          secureTextEntry={showPassword}
-          placeholder="Password"
-          leftIcon={<Icon name="key" type="entypo" size={24} color="black" />}
-          rightIcon={
-            <TouchableOpacity
-              onPress={() => {
-                this.showPassword();
-              }}>
-              <Icon
-                name="eye-with-line"
-                type="entypo"
-                size={24}
-                color="black"
-              />
-            </TouchableOpacity>
-          }
-        />
-        <Button
-          onPress={() => {
-            this.handleLogin();
-          }}
-          loading={loading}
-          buttonStyle={styles.buttonLogin}
-          title="Login"
-        />
-        <Button
-          onPress={() => {
-            this.handleRegist();
-          }}
-          buttonStyle={styles.button}
-          title="Register"
-        />
+          <Input
+            onChangeText={text => {
+              this.handleChange(text, 'password');
+            }}
+            secureTextEntry={showPassword}
+            placeholder="Password"
+            leftIcon={<Icon name="key" type="entypo" size={24} color="black" />}
+            rightIcon={
+              <TouchableOpacity
+                onPress={() => {
+                  this.showPassword();
+                }}>
+                <Icon
+                  name="eye-with-line"
+                  type="entypo"
+                  size={24}
+                  color="black"
+                />
+              </TouchableOpacity>
+            }
+          />
+          <Button
+            onPress={() => {
+              this.handleLogin();
+            }}
+            loading={loading}
+            buttonStyle={styles.buttonLogin}
+            title="Login"
+          />
+          <Button
+            onPress={() => {
+              this.handleRegist();
+            }}
+            buttonStyle={styles.button}
+            title="Register"
+          />
+        </ScrollView>
       </View>
     );
   }

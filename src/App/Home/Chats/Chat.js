@@ -8,25 +8,15 @@ import { db, appFirebase } from '../../../config/firebase';
 class Chat extends Component {
   state = {
     messages: [],
-    id_chat: []
+    id_chat: [],
+    unreadMessage: 0
   };
 
   componentDidMount() {
     const { navigation, auth } = this.props;
-    // const key = navigation.state.params.item.uid;
+    const myKey = auth.data.uid;
+    const key = navigation.state.params.item.uid;
     const id_chat = navigation.state.params.item.id_chat;
-
-    // db.ref(`chat/${id_chat}`).on('child_added', snap => {
-    //   const resultVal = snap.val();
-    //   this.setState(
-    //     previousState => ({
-    //       messages: GiftedChat.append(previousState.messages, [resultVal])
-    //     }),
-    //     () => {
-    //       console.log(this.state.messages);
-    //     }
-    //   );
-    // });
 
     db.ref(`chat/${id_chat}`).on('value', snap => {
       const resultVal = Object.values(snap.val());
@@ -34,11 +24,24 @@ class Chat extends Component {
         messages: resultVal
       });
     });
+
+    db.ref(`chatroom/${key}/${myKey}/`).on('value', snap => {
+      // console.log(snap.val().unreadMessage);
+      this.setState(
+        {
+          unreadMessage: snap.val().unreadMessage
+        },
+        () => {
+          console.log(this.state.unreadMessage);
+        }
+      );
+    });
   }
 
   onSend(messages = []) {
     const { navigation, auth } = this.props;
     const id_chat = navigation.state.params.item.id_chat;
+    const { unreadMessage } = this.state;
     const key = navigation.state.params.item.uid;
     const dataKey =
       navigation.state.params.users[navigation.state.params.item.uid];
@@ -52,11 +55,19 @@ class Chat extends Component {
         avatar: auth.data.photoURL
       }
     });
+    db.ref(`chatroom/${auth.data.uid}/${key}/lastMessage`).set(
+      messages[0].text
+    );
+    db.ref(`chatroom/${key}/${auth.data.uid}/unreadMessage`).set(
+      unreadMessage + 1
+    );
+    db.ref(`chatroom/${key}/${auth.data.uid}/lastMessage`).set(
+      messages[0].text
+    );
   }
 
   render() {
     const { navigation, auth } = this.props;
-    // const { messages } = this.state;
     const messageRendered = this.state.messages;
     const key = navigation.state.params.item.uid;
     const dataKey =
