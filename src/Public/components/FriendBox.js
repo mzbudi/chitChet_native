@@ -36,7 +36,7 @@ class FriendBox extends Component {
                 onPress={() => {
                   this.handleLocation();
                 }}>
-                <Icon type="foundation" name="marker" />
+                <Icon type="entypo" name="location" />
               </TouchableOpacity>
             }
           />
