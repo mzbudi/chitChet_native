@@ -1,39 +1,90 @@
-import React, { Component, Fragment } from 'react';
-import { View, Text, StyleSheet, Image, Button } from 'react-native';
+import React, { Component } from 'react';
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { connect } from 'react-redux';
-// import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
-
-// const link =
-//     'https://scontent.fcgk18-1.fna.fbcdn.net/v/t1.0-9/69612128_2950464841648607_2613556971927764992_n.jpg?_nc_cat=103&_nc_ohc=2DllLbKb1L0AX_wJIP8&_nc_ht=scontent.fcgk18-1.fna&oh=1ee4b610b7be3e50dde3bee0dd4c14f5&oe=5EBB0C9E';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
+import { Button } from 'react-native-elements';
 
 class FriendLocation extends Component {
+  handleMoveYour = () => {
+    const { navigation } = this.props;
+    this.refs.map.animateToRegion(
+      {
+        latitude: navigation.state.params.userLogged.latitude,
+        longitude: navigation.state.params.userLogged.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02
+      },
+      2000
+    );
+  };
+
+  handleMoveFriend = () => {
+    const { navigation } = this.props;
+    this.refs.map.animateToRegion(
+      {
+        latitude: navigation.state.params.data.latitude,
+        longitude: navigation.state.params.data.longitude,
+        latitudeDelta: 0.02,
+        longitudeDelta: 0.02
+      },
+      2000
+    );
+  };
   render() {
+    const { navigation } = this.props;
     return (
-      //             <View style={styles.container}>
-      //                 <MapView
-      //                     ref="map"
-      //                     provider={PROVIDER_GOOGLE} // remove if not using Google Maps
-      //                     style={styles.map}
-      //                     initialRegion={{
-      //                         latitude: -6.6186565,
-      //                         longitude: 106.8251856,
-      //                         latitudeDelta: 0.015,
-      //                         longitudeDelta: 0.0121
-      //                     }}>
-      //                     <Marker
-      //                         coordinate={{
-      //                             latitude: -6.6186565,
-      //                             longitude: 106.8251856
-      //                         }}>
-      //                         <Image
-      //                             source={{ uri: link }}
-      //                             style={{ height: 60, width: 60, borderRadius: 180 }}
-      //                         />
-      //                     </Marker>
-      //                 </MapView>
-      //                 {/* <Button title="Move" onPress={this.handleMove} /> */}
-      // </View>
-      <Text>ini Maps</Text>
+      <View style={styles.container}>
+        <MapView
+          ref="map"
+          provider={PROVIDER_GOOGLE} // remove if not using Google Maps
+          style={styles.map}
+          initialRegion={{
+            latitude: navigation.state.params.userLogged.latitude,
+            longitude: navigation.state.params.userLogged.longitude,
+            latitudeDelta: 0.015,
+            longitudeDelta: 0.015
+          }}>
+          <Marker
+            coordinate={{
+              latitude: navigation.state.params.userLogged.latitude,
+              longitude: navigation.state.params.userLogged.longitude
+            }}>
+            <TouchableOpacity>
+              <Image
+                source={{ uri: navigation.state.params.userLogged.photoURL }}
+                style={{ height: 60, width: 60, borderRadius: 180 }}
+              />
+            </TouchableOpacity>
+          </Marker>
+          <Marker
+            onPress={() => {
+              navigation.navigate('FriendInfo', {
+                data: navigation.state.params.data
+              });
+            }}
+            coordinate={{
+              latitude: navigation.state.params.data.latitude,
+              longitude: navigation.state.params.data.longitude
+            }}>
+            <Image
+              source={{ uri: navigation.state.params.data.photoURL }}
+              style={{ height: 60, width: 60, borderRadius: 180 }}
+            />
+          </Marker>
+        </MapView>
+        <View style={styles.viewStyle}>
+          <Button
+            buttonStyle={styles.buttonStyle}
+            title="Your Loc"
+            onPress={this.handleMoveYour}
+          />
+          <Button
+            buttonStyle={styles.buttonStyle}
+            title="Your Friend Loc"
+            onPress={this.handleMoveFriend}
+          />
+        </View>
+      </View>
     );
   }
 }
@@ -49,10 +100,18 @@ const styles = StyleSheet.create({
     // ...StyleSheet.absoluteFillObject,
     height: '100%',
     width: 400,
-    justifyContent: 'flex-end',
-    alignItems: 'center'
+    justifyContent: 'flex-end'
+    // alignItems: 'center'
   },
   map: {
     ...StyleSheet.absoluteFillObject
+  },
+  buttonStyle: {
+    marginBottom: 10
+  },
+  viewStyle: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginBottom: 16
   }
 });

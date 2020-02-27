@@ -1,8 +1,16 @@
 import React, { Component, Fragment } from 'react';
-import { Text, View, StyleSheet, Image, FlatList } from 'react-native';
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  FlatList,
+  PermissionsAndroid
+} from 'react-native';
 import { connect } from 'react-redux';
 import { Card, ListItem, Badge } from 'react-native-elements';
 import { db, appFirebase } from '../../config/firebase';
+import Geolocation from 'react-native-geolocation-service';
 
 class Home extends Component {
   state = {
@@ -23,8 +31,29 @@ class Home extends Component {
     this.getUser(user.uid);
     this.getAllUsers();
     this.getUserAdded();
-    // this.getChatData();
+    this.getLocation(user.uid);
   }
+
+  getLocation = async user_id => {
+    const hasLocationPermission = await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+      {
+        title: 'Example App',
+        message: 'Example App access to your location '
+      }
+    );
+    if (hasLocationPermission) {
+      Geolocation.getCurrentPosition(position => {
+        db.ref(`/users/${user_id}/latitude`).set(position.coords.latitude);
+        db.ref(`/users/${user_id}/longitude`).set(position.coords.longitude);
+        error => {
+          // See error code charts below.
+          console.log(error.code, error.message);
+        },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 };
+      });
+    }
+  };
 
   getUser = user_id => {
     try {

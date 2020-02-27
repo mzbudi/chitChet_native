@@ -3,9 +3,10 @@ import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
 import { ListItem, Icon, Image } from 'react-native-elements';
 
 class FriendBox extends Component {
-  handleLocation = data => {
+  handleLocation = (data, userLogged) => {
     this.props.navigation.navigate('FriendLocation', {
-      data
+      data,
+      userLogged
     });
   };
 
@@ -14,7 +15,8 @@ class FriendBox extends Component {
   };
 
   render() {
-    const { data } = this.props;
+    const { data, userLogged } = this.props;
+    console.log(data, userLogged);
     return (
       <View style={styles.container}>
         <TouchableOpacity
@@ -34,7 +36,7 @@ class FriendBox extends Component {
             rightIcon={
               <TouchableOpacity
                 onPress={() => {
-                  this.handleLocation();
+                  this.handleLocation(data, userLogged);
                 }}>
                 <Icon type="entypo" name="location" />
               </TouchableOpacity>

@@ -1,4 +1,4 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import {
   Text,
   View,
@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   ToastAndroid
 } from 'react-native';
-import { ListItem, Icon, Image } from 'react-native-elements';
-import { db, appFirebase } from '../../config/firebase';
+import { ListItem, Icon } from 'react-native-elements';
+import { db } from '../../config/firebase';
 
 class AddFriendBox extends Component {
   handleAddFriend = (data, _key, myKey) => {
