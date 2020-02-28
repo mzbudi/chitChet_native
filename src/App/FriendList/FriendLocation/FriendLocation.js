@@ -32,6 +32,7 @@ class FriendLocation extends Component {
   };
   render() {
     const { navigation } = this.props;
+
     return (
       <View style={styles.container}>
         <MapView

@@ -9,7 +9,7 @@ import {
 import { connect } from 'react-redux';
 import { Input, Button, Icon } from 'react-native-elements';
 import { appFirebase } from '../../config/firebase';
-// import logo from '../../Public/assets/chitchetLogo.png';
+import { PICLOC } from 'react-native-dotenv';
 
 class Login extends Component {
   state = {
@@ -76,10 +76,7 @@ class Login extends Component {
       <View style={styles.container}>
         <ScrollView>
           <View>
-            <Image
-              source={require('../../Public/assets/chitchetLogo.png')}
-              style={styles.imgLogo}
-            />
+            <Image source={require(PICLOC)} style={styles.imgLogo} />
           </View>
           <Input
             onChangeText={text => {

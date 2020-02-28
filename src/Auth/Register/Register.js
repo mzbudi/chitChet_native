@@ -9,6 +9,7 @@ import {
 import { connect } from 'react-redux';
 import { db, appFirebase } from '../../config/firebase';
 import { Input, Button, Icon } from 'react-native-elements';
+import { PICLOC } from 'react-native-dotenv';
 
 class Register extends Component {
   state = {
@@ -41,9 +42,21 @@ class Register extends Component {
       .auth()
       .createUserWithEmailAndPassword(email, password)
       .then(credentialUser => {
+        console.log(credentialUser);
         db.ref('/users')
           .child(credentialUser.user.uid)
-          .set({ name, email });
+          .set({ name, email })
+          .then(() => {
+            appFirebase
+              .auth()
+              .signOut()
+              .then(() => {
+                this.props.navigation.navigate('Login');
+              })
+              .catch(error => {
+                console.log('somethings happens');
+              });
+          });
         ToastAndroid.show('Register Succes', ToastAndroid.SHORT);
         navigation.navigate('Login');
       })
@@ -62,10 +75,7 @@ class Register extends Component {
     return (
       <View style={styles.container}>
         <ScrollView>
-          <Image
-            source={require('../../Public/assets/chitchetLogo.png')}
-            style={styles.imgLogo}
-          />
+          <Image source={require(PICLOC)} style={styles.imgLogo} />
           <Input
             onChangeText={text => {
               this.handleChange(text, 'email');
